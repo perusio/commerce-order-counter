@@ -1,0 +1,53 @@
+<?php
+/**
+ * @file
+ *   Enhancements for the Commerce Order Counter support.
+ */
+
+// TODO : We should have a configuration page to manually set and reset the order counter ==> Update the variable.
+
+// TODO : Need to create the action which uses the order-counter token ==> http://dominiquedecooman.com/blog/drupal-custom-rules-how-write-your-own-events-conditions-actions-and-custom-object-custom-token
+
+/**
+ * Implements hook_entity_property_info_alter().
+ */
+function commerce_order_counter_entity_property_info_alter(&$info) {
+  // Add the order counter to the site information.
+  $info['site']['properties']['order_counter'] = array(
+    'label' => t("Order counter"),
+    'description' => t('Number of completed orders.'),
+    'getter callback' => 'commerce_order_counter_get_properties',
+    'type' => 'text',
+  );
+}
+
+/**
+ * Entity metadata callback: returns the order counter.
+ *
+ * @see commerce_multicurrency_entity_property_info_alter()
+ */
+function commerce_order_counter_get_properties($data, array $options, $name) {
+  switch ($name) {
+    case 'order_counter':
+      return commerce_order_counter_get_order_counter();
+  }
+}
+
+/**
+ * Returns the current order counter.
+ * @return string
+ */
+function commerce_order_counter_get_order_counter() {
+  // Set the variable if it doesn't exist already.
+  if(variable_get("order_counter")) {
+    $order_counter = variable_get("order_counter");
+    // Increment the order counter.
+    $new_order_counter = $order_counter + 1;
+    variable_set("order_counter", $new_order_counter);
+  } else {
+    variable_set("order_counter", "100");
+    $order_counter = variable_get("order_counter");
+  }
+
+  return $order_counter;
+}
