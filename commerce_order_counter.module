@@ -4,9 +4,15 @@
  *   Enhancements for the Commerce Order Counter support.
  */
 
-// TODO : We should have a configuration page to manually set and reset the order counter ==> Update the variable.
+// TODO : Create a configuration page to manually set the order counter.
 
-// TODO : Need to create the action which uses the order-counter token ==> http://dominiquedecooman.com/blog/drupal-custom-rules-how-write-your-own-events-conditions-actions-and-custom-object-custom-token
+/**
+ * Implements hook_install().
+ */
+function ommerce_order_counter_install() {
+  // Attach the created action to the Rule.
+  //rules_config_load('commerce_checkout_order_status_update');
+}
 
 /**
  * Implements hook_entity_property_info_alter().
@@ -24,7 +30,7 @@ function commerce_order_counter_entity_property_info_alter(&$info) {
 /**
  * Entity metadata callback: returns the order counter.
  *
- * @see commerce_multicurrency_entity_property_info_alter()
+ * @see commerce_order_counter_entity_property_info_alter()
  */
 function commerce_order_counter_get_properties($data, array $options, $name) {
   switch ($name) {
@@ -38,6 +44,7 @@ function commerce_order_counter_get_properties($data, array $options, $name) {
  * @return string
  */
 function commerce_order_counter_get_order_counter() {
+  dsm('current counter :' . variable_get("order_counter"));
   // Set the variable if it doesn't exist already.
   if(variable_get("order_counter")) {
     $order_counter = variable_get("order_counter");
@@ -48,6 +55,67 @@ function commerce_order_counter_get_order_counter() {
     variable_set("order_counter", "100");
     $order_counter = variable_get("order_counter");
   }
+  dsm('new counter :' . variable_get("order_counter"));
 
   return $order_counter;
+}
+
+function commerce_order_counter_validate_number_unique($order_number, $order_id) {
+  // TODO : Need to check that the order number is not already in use.
+/*
+  // Look for an ID of an order matching the supplied number.
+  if ($match_id = db_query('SELECT order_id FROM {commerce_order} WHERE order_number = :order_number', array(':order_number' => $order_number))->fetchField()) {
+    // If this number is supposed to be for a new order or an order other than
+    // the one that matched...
+    if (empty($order_id) || $match_id != $order_id) {
+      return FALSE;
+    }
+  }
+*/
+  return TRUE;
+}
+
+/**
+ * Updates the order number of an order to the specified counter.
+ *
+ * @param $order
+ *   The fully loaded order object to update.
+ * @param $number
+ *   The number as string of the order to update to.
+ * @param $skip_save
+ *   TRUE to skip saving the order after updating the status; used when the
+ *     order would be saved elsewhere after the update.
+ * @param $revision
+ *   TRUE or FALSE indicating whether or not a new revision should be created
+ *   for the order if it is saved as part of the status update. If missing or
+ *   NULL, the value configured in "Order settings" is used.
+ * @param $log
+ *   If a new revision is created for the update, the log message that will be
+ *     used for the revision.
+ *
+ * @return
+ *   The updated order.
+ */
+function commerce_order_counter_number_update($order, $number, $skip_save = FALSE, $revision = NULL, $log = '') {
+  if (!isset($revision)) {
+    $revision = variable_get('commerce_order_auto_revision', TRUE);
+  }
+
+  // Do not update the order if the order number is already the same.
+  if ($order->order_number != $number) {
+    $order->order_number = $number;
+
+    if (!$skip_save) {
+      // If the status update should create a new revision, update the order
+      // object to reflect this and include a log message.
+      if ($revision) {
+        $order->revision = TRUE;
+        $order->log = $log;
+      }
+
+      commerce_order_save($order);
+    }
+  }
+
+  return $order;
 }
