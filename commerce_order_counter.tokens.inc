@@ -1,7 +1,12 @@
 <?php
 /**
- * @file
- * Token callbacks for the commerce_order_counter module.
+ * @file   commerce_order_counter.tokens.inc
+ * @author Augustin Delaporte <guss.tissier@gmail.com>
+ *         António P. P. Almeida <appa@perusio.net>
+ * @date   Wed Mar  6 19:07:29 2013
+ *
+ * @brief  Token integration for commerce_order_counter.
+ *
  */
 
 /**
@@ -10,18 +15,16 @@
 function commerce_order_counter_token_info() {
   $tokens['order-counter'] = array(
     'name' => t('Order counter'),
-    'description' => t('Number of completed orders.'),
+    'description' => t('Number or code for completed orders.'),
   );
 
-  return array(
-    'tokens' => array('user' => $tokens),
-  );
-}
+  return array('tokens' => array('user' => $tokens),);
+} // commerce_order_counter_token_info
 
 /**
  * Implements hook_tokens().
  */
-function ccommerce_order_counter_tokens($type, $tokens, array $data = array(), array $options = array()) {
+function commerce_order_counter_tokens($type, $tokens, array $data = array(), array $options = array()) {
   $replacements = array();
   if ($type == 'user') {
     if (isset($tokens['order-counter'])) {
@@ -29,4 +32,4 @@ function ccommerce_order_counter_tokens($type, $tokens, array $data = array(), a
     }
   }
   return $replacements;
-}
+} // commerce_order_counter_tokens
