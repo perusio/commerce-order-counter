@@ -1,31 +1,31 @@
 <?php
 /**
- * @file
- *   Enhancements for the Commerce Order Counter support.
+ * @file   commerce_order_counter.module
+ * @author Augustin Delaporte <guss.tissier@gmail.com>
+ *         António P. P. Almeida <appa@perusio.net>
+ * @date   Wed Mar  6 17:34:28 2013
+ *
+ * @brief  Implements a generic framework for having order numbers/codes
+ *         be independent from the order ID. This is particularly useful
+ *         when issuing receipts and/or invoices where usually the numbering
+ *         must follow a particular scheme. Usually sequential, but it can be
+ *         more complicated. In fact arbitrarily complex.
  */
-
-// TODO : Create a configuration page to manually set the order counter.
-
-/**
- * Implements hook_install().
- */
-function ommerce_order_counter_install() {
-  // Attach the created action to the Rule.
-  //rules_config_load('commerce_checkout_order_status_update');
-}
 
 /**
  * Implements hook_entity_property_info_alter().
  */
 function commerce_order_counter_entity_property_info_alter(&$info) {
-  // Add the order counter to the site information.
+  // Add the order counter to the site information. Even if this is just a
+  // "placeholder" entity, i.e., has no schema it functions as a bin for this
+  // value we then recover it using tokens for the rules action.
   $info['site']['properties']['order_counter'] = array(
     'label' => t("Order counter"),
     'description' => t('Number of completed orders.'),
     'getter callback' => 'commerce_order_counter_get_properties',
     'type' => 'text',
   );
-}
+} // commerce_order_counter_entity_property_info_alter
 
 /**
  * Entity metadata callback: returns the order counter.
@@ -37,11 +37,14 @@ function commerce_order_counter_get_properties($data, array $options, $name) {
     case 'order_counter':
       return commerce_order_counter_get_order_counter();
   }
-}
+} // commerce_order_counter_get_properties
 
 /**
  * Returns the current order counter.
+ *
  * @return string
+ *
+ * @todo This needs to be abstracted.
  */
 function commerce_order_counter_get_order_counter() {
   dsm('current counter :' . variable_get("order_counter"));
@@ -60,51 +63,44 @@ function commerce_order_counter_get_order_counter() {
   return $order_counter;
 }
 
-function commerce_order_counter_validate_number_unique($order_number, $order_id) {
-  // TODO : Need to check that the order number is not already in use.
-/*
-  // Look for an ID of an order matching the supplied number.
-  if ($match_id = db_query('SELECT order_id FROM {commerce_order} WHERE order_number = :order_number', array(':order_number' => $order_number))->fetchField()) {
-    // If this number is supposed to be for a new order or an order other than
-    // the one that matched...
-    if (empty($order_id) || $match_id != $order_id) {
-      return FALSE;
-    }
-  }
-*/
-  return TRUE;
-}
-
 /**
- * Updates the order number of an order to the specified counter.
+ * Updates the order number of the given order to the specified counter value.
  *
- * @param $order
- *   The fully loaded order object to update.
- * @param $number
- *   The number as string of the order to update to.
- * @param $skip_save
+ * @param object $order
+ *   The fully loaded order object (to eventually update).
+ * @param int|string $number
+ *   The number or a string of the order number to be updated to.
+ * @param boolean $skip_save
  *   TRUE to skip saving the order after updating the status; used when the
- *     order would be saved elsewhere after the update.
- * @param $revision
+ *   order would be saved elsewhere after the update.
+ * @param boolean $revision
  *   TRUE or FALSE indicating whether or not a new revision should be created
- *   for the order if it is saved as part of the status update. If missing or
- *   NULL, the value configured in "Order settings" is used.
- * @param $log
+ *   for the order if it is saved as part of the status update.
+ * @param string $log
  *   If a new revision is created for the update, the log message that will be
- *     used for the revision.
+ *   used for the revision.
  *
- * @return
+ * @return object
  *   The updated order.
  */
-function commerce_order_counter_number_update($order, $number, $skip_save = FALSE, $revision = NULL, $log = '') {
-  if (!isset($revision)) {
-    $revision = variable_get('commerce_order_auto_revision', TRUE);
-  }
+function commerce_order_counter_number_update($order,
+                                              $number,
+                                              $skip_save = FALSE,
+                                              $revision = FALSE,
+                                              $log = '') {
+
+  // Get the status on how to act regarding revisions.
+  $revision = empty($revision) ? variable_get('commerce_order_auto_revision',
+                                              TRUE)
+    :
+    $revision;
 
   // Do not update the order if the order number is already the same.
   if ($order->order_number != $number) {
     $order->order_number = $number;
 
+    // If we're saving the order then verify if we need to update the revision
+    // also.
     if (!$skip_save) {
       // If the status update should create a new revision, update the order
       // object to reflect this and include a log message.
@@ -112,10 +108,9 @@ function commerce_order_counter_number_update($order, $number, $skip_save = FALS
         $order->revision = TRUE;
         $order->log = $log;
       }
-
       commerce_order_save($order);
     }
   }
 
   return $order;
-}
+} // commerce_order_counter_update

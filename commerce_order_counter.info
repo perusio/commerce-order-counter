@@ -1,6 +1,7 @@
-name = "Commerce Order Counter"
-package = "Commerce (contrib)"
-description = "Add a counter for the completed orders."
+name = Commerce Order Counter
+package = Commerce (contrib)
+description = Add a counter for the completed orders.
 
-core = "7.x"
-dependencies[]="commerce"
+core = 7.x
+dependencies[] = commerce
+files[] = commerce_order_counter.rules.inc

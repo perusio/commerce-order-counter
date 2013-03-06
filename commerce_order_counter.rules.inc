@@ -1,13 +1,20 @@
 <?php
-
-// TODO : Still need to attach that action when enabling the module to the Checkout completion Rule.
-// rules config load : commerce_checkout_order_status_update
-//
+/**
+ * @file   commerce_order_counter.rules.inc
+ * @author Augustin Delaporte <guss.tissier@gmail.com>
+ *         António P. P. Almeida <appa@perusio.net>
+ * @date   Wed Mar  6 18:08:38 2013
+ *
+ * @brief Rules integration. Provides the rules action that increments the
+ *        order counter.
+ *
+ */
 
 /**
- * Implementation of hook_rules_action_info().
+ * Implements hook_rules_action_info().
  *
  * Create the action to update the order number with the order-counter token.
+ *
  */
 function commerce_order_counter_rules_action_info() {
   $actions = array();
@@ -33,12 +40,25 @@ function commerce_order_counter_rules_action_info() {
   );
 
   return $actions;
-}
+} // commerce_order_counter_rules_action_info
 
 /**
- * Rules action callback.
+ * Updates the order number using the current order and taking in
+ * consideration the increment method.
+ *
+ * @param int $order
+ *   The order ID.
+ * @param int $number
+ *   The order number.
+ * @return int
+ *   The new order number.
+ *
+ * @todo Abstract this and use an interface to make it clean.
  */
 function commerce_order_counter_rules_update_number($order, $number) {
-  // Update the order number using the $number parameter. By default, it's set to the [site:order-counter] token.
-  commerce_order_counter_number_update($order, $number, FALSE, NULL, t('Order number updated via Rules.'));
+  // Update the order number using the $number parameter. By default, it's set
+  // to the [site:order-counter] token.
+  commerce_order_counter_number_update(
+    $order, $number, FALSE, NULL, t('Order number updated via Rules.')
+  );
 }
