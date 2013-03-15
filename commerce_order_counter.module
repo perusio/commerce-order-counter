@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file   commerce_order_counter.module
  * @author Augustin Delaporte <guss.tissier@gmail.com>
@@ -11,6 +12,24 @@
  *         must follow a particular scheme. Usually sequential, but it can be
  *         more complicated. In fact arbitrarily complex.
  */
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_order_counter_menu() {
+  $items = array();
+
+  $items['admin/commerce/config/order-counter'] = array(
+    'title' => 'Order Counter Base Value Setup',
+    'description' => 'Setup the base value for the order counter: a human friendly way of counting orders',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_order_counter_settings_form'),
+    'access arguments' => array('configure order settings'),
+    'file' => 'includes/commerce_order_counter.admin.inc',
+  );
+
+  return $items;
+} // commerce_order_counter_menu
 
 /**
  * Implements hook_entity_property_info_alter().
@@ -35,33 +54,9 @@ function commerce_order_counter_entity_property_info_alter(&$info) {
 function commerce_order_counter_get_properties($data, array $options, $name) {
   switch ($name) {
     case 'order_counter':
-      return commerce_order_counter_get_order_counter();
+      return commerce_order_counter_get();
   }
 } // commerce_order_counter_get_properties
-
-/**
- * Returns the current order counter.
- *
- * @return string
- *
- * @todo This needs to be abstracted.
- */
-function commerce_order_counter_get_order_counter() {
-  dsm('current counter :' . variable_get("order_counter"));
-  // Set the variable if it doesn't exist already.
-  if(variable_get("order_counter")) {
-    $order_counter = variable_get("order_counter");
-    // Increment the order counter.
-    $new_order_counter = $order_counter + 1;
-    variable_set("order_counter", $new_order_counter);
-  } else {
-    variable_set("order_counter", "100");
-    $order_counter = variable_get("order_counter");
-  }
-  dsm('new counter :' . variable_get("order_counter"));
-
-  return $order_counter;
-}
 
 /**
  * Updates the order number of the given order to the specified counter value.
@@ -114,3 +109,32 @@ function commerce_order_counter_number_update($order,
 
   return $order;
 } // commerce_order_counter_update
+
+/**
+ *
+ * Interface that specifies the way to increment and access the commerce order
+ * counter. Each module wanting to have specific order counters should implement
+ * this interface. The default implementation offers a simple sequential counter.
+ *
+ */
+interface CommerceOrderCounter {
+
+  /**
+   * Sets the value of the commerce order counter.
+   *
+   * @param int $counter_value
+   *   The current value of the counter.
+   * @return int
+   *   The updated counter.
+   */
+  public static function set($counter_value);
+
+  /**
+   * Gets the current value of the commerce order counter.
+   *
+   * @return int
+   *   The current counter value.
+   */
+  public static function get();
+
+} // CommerceOrderCounter

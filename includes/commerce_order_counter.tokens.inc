@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file   commerce_order_counter.tokens.inc
  * @author Augustin Delaporte <guss.tissier@gmail.com>

@@ -1,7 +1,15 @@
 name = Commerce Order Counter
 package = Commerce (contrib)
-description = Add a counter for the completed orders.
-
+description = Add a counter for the completed orders so that we .
 core = 7.x
+
 dependencies[] = commerce
-files[] = commerce_order_counter.rules.inc
+
+configure = admin/store/config/order-counter
+
+files[] = includes/commerce_order_counter.module
+
+;;; Local Variables:
+;;; mode: conf
+;;; coding: utf-8
+;;; End:

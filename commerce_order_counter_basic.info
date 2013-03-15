@@ -1,0 +1,15 @@
+name = Commerce Order Counter Basic
+package = Commerce (contrib)
+description = Implements the basic order counter with sequential integers 
+core = 7.x
+
+dependencies[] = commerce_order_counter
+
+configure = admin/store/config/order-counter
+
+files[] = includes/commerce_order_counter_basic.module
+
+;;; Local Variables:
+;;; mode: conf
+;;; coding: utf-8
+;;; End:
