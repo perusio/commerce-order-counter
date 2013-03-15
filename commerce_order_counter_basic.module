@@ -42,24 +42,3 @@ class BasicCommerceOrderCounter implements CommerceOrderCounterInterface {
   } // commerce_order_counter_get
 }
 
-/**
- * Wrapper function for the CommerceOrderCounterInterface setter.
- *
- * @param integer|string $counter_value
- *
- * @return integer|string
- *   The new value.
- */
-function commerce_order_counter_order_set($counter_value) {
-  BasicCommerceOrderCounter::set($counter_value);
-} // commerce_order_counter_order_set
-
-/**
- * Wrapper function for the CommerceOrderCounterInterface getter.
- *
- * @return integer|string
- *   The current counter value.
- */
-function commerce_order_counter_order_get() {
-  BasicCommerceOrderCounter::get();
-} // commerce_order_counter_order_get
