@@ -169,14 +169,14 @@ function commerce_order_counter_order_get() {
  *  CommerceOrderCounter class that implements a sequential counter.
  *
  */
-class BasicCommerceOrderCounter implements CommerceOrderCounterInterface {
+class BasicCommerceOrderCounter implements CommerceOrderCounter {
 
   /**
    * The setter for the class.
    *
    * @see CommerceOrderCounterInterface
    */
-  public static function commerce_order_counter_set($counter_value) {
+  public static function set($counter_value) {
     $value = $counter_value;
 
     variable_set('commerce_order_counter_value', $value++);
@@ -189,7 +189,7 @@ class BasicCommerceOrderCounter implements CommerceOrderCounterInterface {
    *
    * @see CommerceOrderCounterInterface
    */
-  public static function commerce_order_counter_get() {
+  public static function get() {
     return intval(variable_get('commerce_order_counter_value', 1));
   } // commerce_order_counter_get
 }
