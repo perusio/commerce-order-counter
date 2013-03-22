@@ -148,7 +148,7 @@ interface CommerceOrderCounter {
  *   The new value.
  */
 function commerce_order_counter_order_set($counter_value) {
-  $class = variable_get('CommerceOrderCounterClass', '');
+  $class = variable_get('CommerceOrderCounterClass', 'BasicCommerceOrderCounter');
   $class::set($counter_value);
 } // commerce_order_counter_order_set
 
@@ -159,6 +159,37 @@ function commerce_order_counter_order_set($counter_value) {
  *   The current counter value.
  */
 function commerce_order_counter_order_get() {
-  $class = variable_get('CommerceOrderCounterClass', '');
+  $class = variable_get('CommerceOrderCounterClass', 'BasicCommerceOrderCounter');
   $class::get();
 } // commerce_order_counter_order_get
+
+/**
+ *
+ *  Implements the CommerceOrderCounter interface. Provides a basic
+ *  CommerceOrderCounter class that implements a sequential counter.
+ *
+ */
+class BasicCommerceOrderCounter implements CommerceOrderCounterInterface {
+
+  /**
+   * The setter for the class.
+   *
+   * @see CommerceOrderCounterInterface
+   */
+  public static function commerce_order_counter_set($counter_value) {
+    $value = $counter_value;
+
+    variable_set('commerce_order_counter_value', $value++);
+
+    return $value;
+  } // commerce_order_counter_set
+
+  /**
+   * The getter for the class.
+   *
+   * @see CommerceOrderCounterInterface
+   */
+  public static function commerce_order_counter_get() {
+    return intval(variable_get('commerce_order_counter_value', 1));
+  } // commerce_order_counter_get
+}
