@@ -5,7 +5,7 @@ core = 7.x
 
 dependencies[] = commerce
 
-configure = admin/store/config/order-counter
+configure = admin/commerce/config/order-counter
 
 files[] = includes/commerce_order_counter.module
 
