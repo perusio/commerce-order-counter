@@ -181,7 +181,8 @@ class BasicCommerceOrderCounter implements CommerceOrderCounter {
 
     variable_set('commerce_order_counter_value', $counter_value + 1);
 
-    return variable_get('commerce_order_counter_value', '1');
+    return variable_get('commerce_order_counter_value',
+                        COMMERCE_ORDER_COUNTER_DEFAULT_BASE_VALUE);
   } // commerce_order_counter_set
 
   /**
