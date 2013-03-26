@@ -58,9 +58,7 @@ function commerce_order_counter_rules_action_info() {
 function commerce_order_counter_rules_update_number($order, $number) {
   // Update the order number using the $number parameter. By default, it's set
   // to the [site:order-counter] token.
-  dd($order, 'o');
-  dd($number, 'n');
   commerce_order_counter_number_update(
-    $order, commerce_order_counter_set($number), FALSE, NULL, t('Order number updated via Rules.')
+    $order, commerce_order_counter_order_set($number), FALSE, NULL, t('Order number updated via Rules.')
   );
-} // commerce_order_counter_update_number
+} // commerce_order_counter_rules_update_number

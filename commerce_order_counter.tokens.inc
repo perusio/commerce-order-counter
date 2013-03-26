@@ -14,12 +14,14 @@
  * Implements hook_token_info().
  */
 function commerce_order_counter_token_info() {
-  $tokens['order-counter'] = array(
+  $info = array();
+
+  $info['tokens']['site']['order-counter'] = array(
     'name' => t('Order counter'),
-    'description' => t('Number or code for completed orders.'),
+    'description' => t('Completed orders code or number.'),
   );
 
-  return array('tokens' => array('user' => $tokens),);
+  return $info;
 } // commerce_order_counter_token_info
 
 /**
@@ -27,9 +29,10 @@ function commerce_order_counter_token_info() {
  */
 function commerce_order_counter_tokens($type, $tokens, array $data = array(), array $options = array()) {
   $replacements = array();
-  if ($type == 'user') {
+
+  if ($type == 'site') {
     if (isset($tokens['order-counter'])) {
-      $replacements[$tokens['order-counter']] = commerce_order_counter_get_order_counter();
+      $replacements[$tokens['order-counter']] = commerce_order_counter_order_get();
     }
   }
   return $replacements;

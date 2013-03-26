@@ -28,9 +28,9 @@ function commerce_order_counter_default_rules_configuration() {
   // that the order counter is incremented.
   $rule
     ->event('commerce_checkout_complete')
-    ->action('commerce_order_counter_rules_update_number', array(
+    ->action('commerce_order_counter_update_order_number', array(
                'commerce_order:select' => 'commerce-order',
-               'order_number' => variable_get('commerce_order_counter_value', 1),
+               'order_number' => commerce_order_counter_order_get(),
              )
     );
 
