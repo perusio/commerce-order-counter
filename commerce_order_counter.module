@@ -20,7 +20,7 @@ function commerce_order_counter_menu() {
   $items = array();
 
   $items['admin/commerce/config/order-counter'] = array(
-    'title' => 'Order Counter Base Value Setup',
+    'title' => 'Order Counter Base',
     'description' => 'Setup the base value for the order counter: a human friendly way of counting orders',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('commerce_order_counter_settings_form'),
@@ -54,7 +54,7 @@ function commerce_order_counter_entity_property_info_alter(&$info) {
 function commerce_order_counter_get_properties($data, array $options, $name) {
   switch ($name) {
     case 'order_counter':
-      return commerce_order_counter_get();
+      return commerce_order_counter_order_get();
   }
 } // commerce_order_counter_get_properties
 
@@ -77,6 +77,8 @@ function commerce_order_counter_get_properties($data, array $options, $name) {
  *
  * @return object
  *   The updated order.
+ *
+ *   @see commerce_order_status_update
  */
 function commerce_order_counter_number_update($order,
                                               $number,
@@ -93,7 +95,6 @@ function commerce_order_counter_number_update($order,
   // Do not update the order if the order number is already the same.
   if ($order->order_number != $number) {
     $order->order_number = $number;
-
     // If we're saving the order then verify if we need to update the revision
     // also.
     if (!$skip_save) {
@@ -149,7 +150,7 @@ interface CommerceOrderCounter {
  */
 function commerce_order_counter_order_set($counter_value) {
   $class = variable_get('CommerceOrderCounterClass', 'BasicCommerceOrderCounter');
-  $class::set($counter_value);
+  return $class::set($counter_value);
 } // commerce_order_counter_order_set
 
 /**
@@ -160,7 +161,7 @@ function commerce_order_counter_order_set($counter_value) {
  */
 function commerce_order_counter_order_get() {
   $class = variable_get('CommerceOrderCounterClass', 'BasicCommerceOrderCounter');
-  $class::get();
+  return $class::get();
 } // commerce_order_counter_order_get
 
 /**

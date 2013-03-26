@@ -1,6 +1,6 @@
 name = Commerce Order Counter
 package = Commerce (contrib)
-description = Add a counter for the completed orders so that we .
+description = Add a counter for the completed orders so that we have custom order number.
 core = 7.x
 
 dependencies[] = commerce

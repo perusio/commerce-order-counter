@@ -22,25 +22,17 @@ function commerce_order_counter_settings_form() {
 
   $form['commerce_order_counter_value'] = array(
     '#type' => 'textfield',
-    '#title' => t('Commerce Order Counter Base Value'),
+    '#title' => t('Order Counter Base'),
     '#description' => t('The value being used as the base for the commerce order numbering: assumed to be a <strong>positive integer</strong>.'),
-    '#default_value' => variable_get('commerce_order_counter_base',
+    '#default_value' => variable_get('commerce_order_counter_value',
                                      COMMERCE_ORDER_COUNTER_DEFAULT_BASE_VALUE),
     '#required' => TRUE,
     '#maxlength' => 60,
     '#size' => 20,
     '#element_validate' => array(
       'element_validate_integer_positive',
-      'commerce_order_counter_unique_value_validate'
     ),
   );
 
   return system_settings_form($form);
 } // commerce_order_counter_settings_form
-
-/**
- * Settings form validation callback.
- */
-function commerce_order_counter_unique_value_validate() {
-
-} // commerce_order_counter_unique_value_validate
