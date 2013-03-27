@@ -46,7 +46,7 @@ interface.
 
 Besides that you need to add to your `settings.php`:
 
-    // Make the module use my order counter scheme.
+    // Make the module use my order numbering scheme.
     $conf['CommerceOrderCounterClass'] = 'YourCommerceOrderCounter';
    
 where `YourCommerceOrderCounter` is the name of your class implementing
