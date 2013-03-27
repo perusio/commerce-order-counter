@@ -123,9 +123,9 @@ interface CommerceOrderCounter {
   /**
    * Sets the value of the commerce order counter.
    *
-   * @param int $counter_value
+   * @param int|string $counter_value
    *   The current value of the counter.
-   * @return int
+   * @return int|string
    *   The updated counter.
    */
   public static function set($counter_value);
@@ -133,10 +133,24 @@ interface CommerceOrderCounter {
   /**
    * Gets the current value of the commerce order counter.
    *
-   * @return int
+   * @return int|string
    *   The current counter value.
    */
   public static function get();
+
+  /**
+   * Makes sure that the counter value is unique. Note that the schema for the
+   * order module specifies the order_number column as unique.
+   *
+   *  @param int|string $counter_value
+   *   The updated value of the counter.
+   *  @return int|string
+   *   The unique updated counter.
+   *
+   * @see commerce_order_schema
+   */
+
+  public static function unique($updated_counter);
 
 } // CommerceOrderCounter
 
@@ -144,7 +158,7 @@ interface CommerceOrderCounter {
  * Wrapper function for the CommerceOrderCounterInterface setter.
  *
  * @param integer|string $counter_value
- *
+ *   The current counter value.
  * @return integer|string
  *   The new value.
  */
@@ -165,6 +179,20 @@ function commerce_order_counter_order_get() {
 } // commerce_order_counter_order_get
 
 /**
+ * Wrapper function for the CommerceOrderCounterInterface unique operator.
+ *
+ *  @param int|string $counter_value
+ *   The updated value of the counter.
+ *  @return int|string
+ *   The unique updated counter.
+ *
+ */
+function commerce_order_counter_unique($updated_counter) {
+  $class = variable_get('CommerceOrderCounterClass', 'BasicCommerceOrderCounter');
+  return $class::unique($updated_counter);
+} // commerce_order_counter_order_unique
+
+/**
  *
  *  Implements the CommerceOrderCounter interface. Provides a basic
  *  CommerceOrderCounter class that implements a sequential counter.
@@ -179,7 +207,8 @@ class BasicCommerceOrderCounter implements CommerceOrderCounter {
    */
   public static function set($counter_value) {
 
-    variable_set('commerce_order_counter_value', $counter_value + 1);
+    // Make sure that the counter value is unique by invoking the unique method.
+    variable_set('commerce_order_counter_value', self::unique($counter_value + 1));
 
     return variable_get('commerce_order_counter_value',
                         COMMERCE_ORDER_COUNTER_DEFAULT_BASE_VALUE);
@@ -191,6 +220,28 @@ class BasicCommerceOrderCounter implements CommerceOrderCounter {
    * @see CommerceOrderCounterInterface
    */
   public static function get() {
-    return intval(variable_get('commerce_order_counter_value', 1));
+    return intval(variable_get('commerce_order_counter_value',
+                               COMMERCE_ORDER_COUNTER_DEFAULT_BASE_VALUE));
   } // commerce_order_counter_get
-}
+
+  /**
+   * Implementation of the unique operator.
+   *
+   * @see CommerceOrderCounterInterface
+   */
+
+  public static function unique($updated_counter) {
+    $counter = $updated_counter;
+    // We check the value of the counter and keep incrementing until the value
+    // is unique.
+    while (
+      db_query('SELECT order_number FROM {commerce_order} WHERE order_number = :counter',
+               array(':counter' => $counter))
+      ->fetchField()) {
+      $counter++;
+    } // while
+
+    return $counter;
+  } // unique
+
+} // BasicCommerceOrderCounter
