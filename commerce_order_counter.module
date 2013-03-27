@@ -13,6 +13,10 @@
  *         more complicated. In fact arbitrarily complex.
  */
 
+// By default the base value is one, since in most cases we want a numeric
+// scheme for the invoice numbering.
+define('COMMERCE_ORDER_COUNTER_DEFAULT_BASE_VALUE', 1);
+
 /**
  * Implements hook_menu().
  */
@@ -209,9 +213,15 @@ class BasicCommerceOrderCounter implements CommerceOrderCounter {
 
     // Make sure that the counter value is unique by invoking the unique method.
     variable_set('commerce_order_counter_value', self::unique($counter_value + 1));
+    // Get the current value after setting it up.
+    $counter = variable_get('commerce_order_counter_value',
+                            COMMERCE_ORDER_COUNTER_DEFAULT_BASE_VALUE);
+    // Write to the watchdog the setting of the order number.
+    watchdog('commerce_order_counter', 'Commerce Order number set to @number.',
+             array('@number' => $counter)
+    );
 
-    return variable_get('commerce_order_counter_value',
-                        COMMERCE_ORDER_COUNTER_DEFAULT_BASE_VALUE);
+    return $counter;
   } // commerce_order_counter_set
 
   /**

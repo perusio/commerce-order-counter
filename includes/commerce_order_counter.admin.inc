@@ -10,10 +10,6 @@
  *
  */
 
-// By default the base value is one, since in most cases we want a numeric
-// scheme for the invoice numbering.
-define('COMMERCE_ORDER_COUNTER_DEFAULT_BASE_VALUE', 1);
-
 /**
  * Settings form definition page callback.
  */
